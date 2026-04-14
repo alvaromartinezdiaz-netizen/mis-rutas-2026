@@ -103,22 +103,19 @@
         .km { font-size: 1.8rem; font-weight: 900; text-align: center; position: relative; z-index: 2; }
         .unit { font-size: 0.55rem; color: #555; letter-spacing: 1px; text-align: center; display: block; position: relative; z-index: 2; }
 
-        /* --- NUEVO ESTADO USADO: ROJO STÁTICO Y MÁS VISIBLE --- */
+        /* ESTADO USADO */
         .ticket.used { 
-            opacity: 0.4; /* Sube la opacidad (antes 0.15) */
-            filter: grayscale(1) brightness(0.8) hue-rotate(-120deg) saturate(3); /* Tinte rojo intenso */
+            opacity: 0.4; 
+            filter: grayscale(1) brightness(0.8) hue-rotate(-120deg) saturate(3); 
             pointer-events: none; 
-            
-            /* Eliminar todas las animaciones y sombras */
             animation: none !important; 
             border-color: rgba(255, 0, 51, 0.5) !important;
             box-shadow: none !important;
-            background: rgba(128, 0, 0, 0.2) !important; /* Fondo rojo oscuro estático */
+            background: rgba(128, 0, 0, 0.2) !important; 
         }
         
-        .ticket.used::before { display: none !important; } /* Quitar escaneo */
+        .ticket.used::before { display: none !important; } 
         
-        /* Forzar color rojo estático en textos usados */
         .ticket.used .ticket-header, 
         .ticket.used .km, 
         .ticket.used .destination { 
@@ -128,6 +125,57 @@
         
         .rip-line { position: absolute; top: 50%; left: 0; width: 100%; height: 2px; background: var(--used-red); box-shadow: 0 0 15px var(--used-red); transform: translateY(-50%) rotate(-3deg); display: none; z-index: 10; }
         .ticket.used .rip-line { display: block; }
+
+        /* ESTILOS REGLAS (MODAL) */
+        .btn-rules {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: transparent;
+            border: 1px solid #333;
+            color: #666;
+            font-family: 'Orbitron';
+            font-size: 0.6rem;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 10;
+        }
+        .btn-rules:hover {
+            border-color: var(--accent-neon);
+            color: var(--accent-neon);
+            text-shadow: var(--neon-shadow-cyan);
+        }
+
+        #rules-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            padding: 40px 20px;
+            overflow-y: auto;
+        }
+        .rules-content {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        #rules-modal h2 {
+            color: var(--accent-neon);
+            font-size: 0.9rem;
+            letter-spacing: 3px;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: var(--neon-shadow-cyan);
+        }
+        #rules-modal p {
+            font-size: 0.7rem;
+            line-height: 1.6;
+            color: #ccc;
+            margin-bottom: 20px;
+            border-left: 2px solid #222;
+            padding-left: 15px;
+        }
+        #rules-modal strong { color: var(--accent-neon); }
 
         /* LOGIN */
         #login-screen { position: fixed; inset: 0; background: #000; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
@@ -168,6 +216,21 @@
     <h1 id="title" style="display:none">SISTEMA DE RUTAS V1.0</h1>
     <div id="loader">ESTABLECIENDO CONEXIÓN SEGURA...</div>
     <div class="grid" id="container"></div>
+
+    <button id="rules-btn" class="btn-rules" style="display:none" onclick="toggleRules(true)">VER PROTOCOLO DE USO</button>
+
+    <div id="rules-modal">
+        <div class="rules-content">
+            <h2>DIRECTIVAS DE OPERACIÓN</h2>
+            <p><strong>01. CANJE:</strong> El ticket debe ser validado justo antes de la ruta. Una vez pulsado, es irreversible.</p>
+            <p><strong>02. LOGÍSTICA:</strong> El portador controla la temperatura y el sistema de audio de la unidad.</p>
+            <p><strong>03. SEGURIDAD:</strong> El portador asiste como piloto táctico (GPS).</p>
+            <p><strong>04. PRIORIDAD CAT:</strong> Si el acompañante requiere atención, la misión se detiene temporalmente.</p>
+            <p><strong>05. GOLD:</strong> El ticket dorado otorga mando absoluto sobre las coordenadas de destino.</p>
+            <button class="btn-rules" style="width:100%; border-color:#fff; color:#fff;" onclick="toggleRules(false)">CERRAR PROTOCOLO</button>
+        </div>
+    </div>
+
     <footer id="footer" style="display:none">BY <span>VARO CREATIONS</span></footer>
 
     <script>
@@ -211,7 +274,12 @@
             document.getElementById('title').style.display = 'block';
             document.getElementById('footer').style.display = 'block';
             document.getElementById('container').style.display = 'grid';
+            document.getElementById('rules-btn').style.display = 'block';
             initApp();
+        }
+
+        function toggleRules(show) {
+            document.getElementById('rules-modal').style.display = show ? 'block' : 'none';
         }
 
         async function initApp() {
