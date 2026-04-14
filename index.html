@@ -27,23 +27,39 @@
             overflow-x: hidden;
         }
 
-        /* --- SOLUCIÓN PARA EL LOGO OSCURO --- */
-        .logo { 
-            width: 160px; 
-            height: auto; 
-            margin-bottom: 20px; 
-            max-width: 90vw;
-            transition: filter 0.3s ease, transform 0.3s ease;
-            
-            /* --- ESTA ES LA CLAVE --- */
-            /* brightness(0) invert(1) convierte el texto negro en BLANCO */
-            filter: brightness(0) invert(1) drop-shadow(0 0 10px rgba(0, 242, 254, 0.6));
+        /* --- CONTENEDOR DEL LOGO --- */
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+            z-index: 10;
         }
 
-        /* Efecto al pasar el ratón (opcional) */
-        .logo:hover {
-            transform: scale(1.03);
-            filter: brightness(0) invert(1) drop-shadow(0 0 15px rgba(0, 242, 254, 0.9));
+        /* --- EL GATO (RECORTADO VISUALMENTE) --- */
+        .logo-cat { 
+            width: 140px; /* Ancho deseado */
+            height: auto; 
+            max-width: 90vw;
+            
+            /* --- ESTA ES LA CLAVE PARA RECORTAR --- */
+            /* Muestra los primeros 120px de altura y oculta el resto */
+            clip-path: polygon(0 0, 100% 0, 100% 120px, 0 120px);
+            
+            /* Halo cian sutil para integrarlo en la estética */
+            filter: drop-shadow(0 0 10px rgba(0, 242, 254, 0.4));
+        }
+
+        /* --- EL TEXTO "VARO CREATIONS" --- */
+        .logo-text {
+            color: rgba(0, 242, 254, 0.8); /* Cian neón suave */
+            font-size: 0.9rem;
+            font-weight: 400;
+            letter-spacing: 5px; /* Espaciado técnico */
+            text-transform: uppercase;
+            margin-top: -10px; /* Sube un poco para unirse al gato */
+            text-shadow: 0 0 5px rgba(0, 242, 254, 0.4);
+            text-align: center;
         }
 
         h1 { font-size: 0.9rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 30px; text-align: center; color: #555; }
@@ -92,12 +108,6 @@
             75% { transform: translateX(10px); }
         }
 
-        /* Cambiar la sombra del logo al fallar */
-        #login-screen.login-error .logo { 
-            /* Mantenemos la inversión pero cambiamos el color de la sombra a ROJO */
-            filter: brightness(0) invert(1) drop-shadow(0 0 12px var(--used-red)); 
-        }
-
         footer { margin: 40px 0 20px 0; font-size: 0.65rem; letter-spacing: 2px; color: #444; width: 100%; text-align: center; }
         footer span { color: var(--accent-neon); font-weight: 900; }
         #loader { display: none; color: var(--accent-neon); font-size: 0.7rem; margin-top: 20px; letter-spacing: 2px; font-weight: bold; }
@@ -107,13 +117,21 @@
 <body>
 
     <div id="login-screen">
-        <img src="logo.png" class="logo" alt="VAROCREATIONS">
+        <div class="logo-container">
+            <img src="logo.png" class="logo-cat" alt="Gato VaroCreations">
+            <div class="logo-text">VARO CREATIONS</div>
+        </div>
+        
         <p style="font-size: 0.7rem; letter-spacing: 2px; margin: 0;">SE REQUIERE ACCESO SEGURO</p>
         <input type="password" id="pass" placeholder="CONTRASEÑA" onkeydown="handleEnter(event)">
         <div id="error-msg">ACCESO DENEGADO: CLAVE INCORRECTA</div>
     </div>
 
-    <img src="logo.png" class="logo" id="main-logo" style="display:none">
+    <div id="main-logo-container" class="logo-container" style="display:none; margin-top: 20px;">
+        <img src="logo.png" class="logo-cat" alt="Gato VaroCreations">
+        <div class="logo-text">VARO CREATIONS</div>
+    </div>
+    
     <h1 id="title" style="display:none">SISTEMA DE RUTAS V2.0</h1>
     <div id="loader">ESTABLECIENDO CONEXIÓN SEGURA...</div>
     <div class="grid" id="container"></div>
@@ -146,20 +164,16 @@
 
             if (val === ACCESS_KEY) {
                 loginScreen.style.display = 'none';
-                document.getElementById('main-logo').style.display = 'block';
+                document.getElementById('main-logo-container').style.display = 'flex';
                 document.getElementById('title').style.display = 'block';
                 document.getElementById('footer').style.display = 'block';
                 document.getElementById('container').style.display = 'grid';
                 initApp();
             } else {
-                loginScreen.classList.add('login-error');
                 input.classList.add('error');
                 error.style.opacity = '1';
                 input.value = '';
-                setTimeout(() => { 
-                    input.classList.remove('error'); 
-                    loginScreen.classList.remove('login-error');
-                }, 400);
+                setTimeout(() => { input.classList.remove('error'); }, 400);
             }
         }
 
