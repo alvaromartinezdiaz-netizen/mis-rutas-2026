@@ -13,6 +13,9 @@
             --ticket-bg: linear-gradient(145deg, #1a1a1a, #0a0a0a);
             --text-main: #ffffff;
             --used-red: #ff3e3e;
+            /* Sombras para el logo */
+            --logo-shadow-neon: drop-shadow(0 0 10px rgba(0, 242, 254, 0.7));
+            --logo-shadow-white: drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -27,13 +30,15 @@
             overflow-x: hidden;
         }
 
-        /* LOGO */
+        /* LOGO CON EFECTO DROP-SHADOW */
         .logo { 
-            width: 160px; /* Ajustado para evitar cortes */
+            width: 160px; 
             height: auto; 
             margin-bottom: 20px; 
-            filter: drop-shadow(0 0 8px rgba(0, 242, 254, 0.5));
+            /* Esta es la clave: el halo blanco para que se lea el negro */
+            filter: var(--logo-shadow-white); 
             max-width: 90vw;
+            transition: filter 0.3s ease;
         }
 
         h1 { font-size: 0.9rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 30px; text-align: center; color: #555; }
@@ -82,6 +87,9 @@
             75% { transform: translateX(10px); }
         }
 
+        /* Cambiar la sombra del logo al fallar */
+        #login-screen.login-error .logo { filter: drop-shadow(0 0 12px var(--used-red)); }
+
         footer { margin: 40px 0 20px 0; font-size: 0.65rem; letter-spacing: 2px; color: #444; width: 100%; text-align: center; }
         footer span { color: var(--accent-neon); font-weight: 900; }
         #loader { display: none; color: var(--accent-neon); font-size: 0.7rem; margin-top: 20px; letter-spacing: 2px; font-weight: bold; }
@@ -126,19 +134,24 @@
         function checkLogin(val) {
             const input = document.getElementById('pass');
             const error = document.getElementById('error-msg');
+            const loginScreen = document.getElementById('login-screen');
 
             if (val === ACCESS_KEY) {
-                document.getElementById('login-screen').style.display = 'none';
+                loginScreen.style.display = 'none';
                 document.getElementById('main-logo').style.display = 'block';
                 document.getElementById('title').style.display = 'block';
                 document.getElementById('footer').style.display = 'block';
                 document.getElementById('container').style.display = 'grid';
                 initApp();
             } else {
+                loginScreen.classList.add('login-error');
                 input.classList.add('error');
                 error.style.opacity = '1';
                 input.value = '';
-                setTimeout(() => { input.classList.remove('error'); }, 400);
+                setTimeout(() => { 
+                    input.classList.remove('error'); 
+                    loginScreen.classList.remove('login-error');
+                }, 400);
             }
         }
 
