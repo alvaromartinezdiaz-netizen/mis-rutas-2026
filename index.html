@@ -13,9 +13,6 @@
             --ticket-bg: linear-gradient(145deg, #1a1a1a, #0a0a0a);
             --text-main: #ffffff;
             --used-red: #ff3e3e;
-            /* Sombras para el logo */
-            --logo-shadow-neon: drop-shadow(0 0 10px rgba(0, 242, 254, 0.7));
-            --logo-shadow-white: drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -30,15 +27,23 @@
             overflow-x: hidden;
         }
 
-        /* LOGO CON EFECTO DROP-SHADOW */
+        /* --- SOLUCIÓN PARA EL LOGO OSCURO --- */
         .logo { 
             width: 160px; 
             height: auto; 
             margin-bottom: 20px; 
-            /* Esta es la clave: el halo blanco para que se lea el negro */
-            filter: var(--logo-shadow-white); 
             max-width: 90vw;
-            transition: filter 0.3s ease;
+            transition: filter 0.3s ease, transform 0.3s ease;
+            
+            /* --- ESTA ES LA CLAVE --- */
+            /* brightness(0) invert(1) convierte el texto negro en BLANCO */
+            filter: brightness(0) invert(1) drop-shadow(0 0 10px rgba(0, 242, 254, 0.6));
+        }
+
+        /* Efecto al pasar el ratón (opcional) */
+        .logo:hover {
+            transform: scale(1.03);
+            filter: brightness(0) invert(1) drop-shadow(0 0 15px rgba(0, 242, 254, 0.9));
         }
 
         h1 { font-size: 0.9rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 30px; text-align: center; color: #555; }
@@ -88,7 +93,10 @@
         }
 
         /* Cambiar la sombra del logo al fallar */
-        #login-screen.login-error .logo { filter: drop-shadow(0 0 12px var(--used-red)); }
+        #login-screen.login-error .logo { 
+            /* Mantenemos la inversión pero cambiamos el color de la sombra a ROJO */
+            filter: brightness(0) invert(1) drop-shadow(0 0 12px var(--used-red)); 
+        }
 
         footer { margin: 40px 0 20px 0; font-size: 0.65rem; letter-spacing: 2px; color: #444; width: 100%; text-align: center; }
         footer span { color: var(--accent-neon); font-weight: 900; }
