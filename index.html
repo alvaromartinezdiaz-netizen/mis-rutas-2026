@@ -6,20 +6,28 @@
     <title>Tickets de Ruta - VAROCREATIONS</title>
     <style>
         :root {
-            --bg-color: #050505;
+            --bg-color: #030303;
             --accent-neon: #00f2fe;
             --accent-gold: #ffcc00;
             --accent-forest: #39ff14;
-            --ticket-bg: linear-gradient(145deg, #1a1a1a, #0a0a0a);
+            --ticket-bg: linear-gradient(145deg, #111, #050505);
             --text-main: #ffffff;
-            --used-red: #ff3e3e;
+            --used-red: #ff0033;
+            
+            --neon-shadow-cyan: 0 0 10px rgba(0, 242, 254, 0.7), 0 0 20px rgba(0, 242, 254, 0.3);
+            --neon-shadow-green: 0 0 10px rgba(57, 255, 20, 0.7), 0 0 20px rgba(57, 255, 20, 0.3);
+            --neon-shadow-gold: 0 0 15px rgba(255, 204, 0, 0.7), 0 0 30px rgba(255, 204, 0, 0.3);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             background-color: var(--bg-color);
-            background-image: radial-gradient(circle at 50% -20%, #222 0%, transparent 50%);
+            background-image: 
+                radial-gradient(circle at 50% -20%, #222 0%, transparent 50%),
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 30px 30px, 30px 30px;
             color: var(--text-main);
             font-family: 'Orbitron', sans-serif;
             margin: 0; padding: 20px;
@@ -28,20 +36,18 @@
         }
 
         .logo-container { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; z-index: 10; }
-
         .logo-cat { 
             width: 140px; height: auto; max-width: 90vw;
             clip-path: polygon(0 0, 100% 0, 100% 120px, 0 120px);
-            filter: drop-shadow(0 0 10px rgba(0, 242, 254, 0.4));
+            filter: drop-shadow(0 0 10px rgba(0, 242, 254, 0.5));
         }
-
         .logo-text {
-            color: rgba(0, 242, 254, 0.8); font-size: 0.9rem; font-weight: 400;
+            color: var(--accent-neon); font-size: 0.9rem; font-weight: 400;
             letter-spacing: 5px; text-transform: uppercase; margin-top: -10px;
-            text-shadow: 0 0 5px rgba(0, 242, 254, 0.4); text-align: center;
+            text-shadow: var(--neon-shadow-cyan); text-align: center;
         }
 
-        h1 { font-size: 0.9rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 30px; text-align: center; color: #555; }
+        h1 { font-size: 0.8rem; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 30px; text-align: center; color: #333; }
 
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; max-width: 450px; display: none; }
         .ticket-container:last-child { grid-column: 1 / span 2; justify-self: center; width: 85%; }
@@ -49,38 +55,94 @@
 
         .ticket {
             position: absolute; width: 100%; height: 100%;
-            background: var(--ticket-bg); border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between;
-            z-index: 5; transition: all 0.4s ease;
+            background: var(--ticket-bg); border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 4px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between;
+            z-index: 5; transition: all 0.3s ease;
             clip-path: polygon(0 0, 100% 0, 100% calc(50% - 8px), calc(100% - 8px) 50%, 100% calc(50% + 8px), 100% 100%, 0 100%, 0 calc(50% + 8px), 8px 50%, 0 calc(50% - 8px));
+            overflow: hidden; 
+            animation: flicker 5s infinite;
         }
 
-        .ticket.fores .ticket-header, .ticket.fores .km { color: var(--accent-forest); }
-        .ticket.aliga .ticket-header, .ticket.aliga .km { color: var(--accent-neon); }
-        .ticket.special { border: 1px solid var(--accent-gold); }
-        .ticket.special .ticket-header, .ticket.special .km, .ticket.special .destination { color: var(--accent-gold); }
+        .ticket::before {
+            content: '';
+            position: absolute; top: -100%; left: 0; width: 100%; height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+            animation: scanline 3s linear infinite;
+            z-index: 1;
+        }
 
-        .ticket-header { font-size: 0.55rem; letter-spacing: 1px; font-weight: bold; }
-        .destination { font-size: 0.8rem; margin: 5px 0; font-weight: 600; min-height: 2.4em; line-height: 1.2; }
-        .km { font-size: 1.8rem; font-weight: 900; text-align: center; }
-        .unit { font-size: 0.55rem; color: #666; letter-spacing: 1px; text-align: center; display: block; }
+        /* VERDE */
+        .ticket.fores { border-color: rgba(57, 255, 20, 0.3); box-shadow: inset 0 0 10px rgba(57, 255, 20, 0.1); }
+        .ticket.fores .ticket-header, .ticket.fores .km { color: var(--accent-forest); text-shadow: var(--neon-shadow-green); }
 
-        .ticket.used { opacity: 0.3; filter: grayscale(1); transform: scale(0.95) rotate(-2deg); pointer-events: none; }
-        .rip-line { position: absolute; top: 50%; left: 0; width: 100%; height: 2px; background: var(--used-red); box-shadow: 0 0 10px var(--used-red); transform: translateY(-50%) rotate(-3deg); display: none; z-index: 10; }
+        /* CIAN */
+        .ticket.aliga { border-color: rgba(0, 242, 254, 0.3); box-shadow: inset 0 0 10px rgba(0, 242, 254, 0.1); }
+        .ticket.aliga .ticket-header, .ticket.aliga .km { color: var(--accent-neon); text-shadow: var(--neon-shadow-cyan); }
+
+        /* DORADO PREMIUM */
+        .ticket.special { 
+            border-color: rgba(255, 204, 0, 0.6);
+            animation: superGoldenPulse 2s infinite, flicker 5s infinite;
+        }
+        .ticket.special .ticket-header, .ticket.special .km, .ticket.special .destination { 
+            color: var(--accent-gold); text-shadow: var(--neon-shadow-gold);
+        }
+
+        /* ANIMACIONES */
+        @keyframes superGoldenPulse {
+            0% { box-shadow: 0 0 15px rgba(255, 204, 0, 0.4), inset 0 0 15px rgba(255, 204, 0, 0.2); border-color: rgba(255, 204, 0, 0.6); }
+            50% { box-shadow: 0 0 40px rgba(255, 204, 0, 0.8), inset 0 0 25px rgba(255, 204, 0, 0.4); border-color: rgba(255, 204, 0, 1); }
+            100% { box-shadow: 0 0 15px rgba(255, 204, 0, 0.4), inset 0 0 15px rgba(255, 204, 0, 0.2); border-color: rgba(255, 204, 0, 0.6); }
+        }
+        @keyframes scanline { 0% { top: -100%; } 100% { top: 200%; } }
+        @keyframes flicker { 0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100% { opacity: 1; } 20%, 21.999%, 63%, 63.999%, 65%, 69.999% { opacity: 0.8; } }
+
+        .ticket-header { font-size: 0.55rem; letter-spacing: 2px; font-weight: bold; position: relative; z-index: 2; }
+        .destination { font-size: 0.8rem; margin: 5px 0; font-weight: 600; min-height: 2.4em; line-height: 1.2; position: relative; z-index: 2; }
+        .km { font-size: 1.8rem; font-weight: 900; text-align: center; position: relative; z-index: 2; }
+        .unit { font-size: 0.55rem; color: #555; letter-spacing: 1px; text-align: center; display: block; position: relative; z-index: 2; }
+
+        /* --- NUEVO ESTADO USADO: ROJO STÁTICO Y MÁS VISIBLE --- */
+        .ticket.used { 
+            opacity: 0.4; /* Sube la opacidad (antes 0.15) */
+            filter: grayscale(1) brightness(0.8) hue-rotate(-120deg) saturate(3); /* Tinte rojo intenso */
+            pointer-events: none; 
+            
+            /* Eliminar todas las animaciones y sombras */
+            animation: none !important; 
+            border-color: rgba(255, 0, 51, 0.5) !important;
+            box-shadow: none !important;
+            background: rgba(128, 0, 0, 0.2) !important; /* Fondo rojo oscuro estático */
+        }
+        
+        .ticket.used::before { display: none !important; } /* Quitar escaneo */
+        
+        /* Forzar color rojo estático en textos usados */
+        .ticket.used .ticket-header, 
+        .ticket.used .km, 
+        .ticket.used .destination { 
+            color: #ff3333 !important; 
+            text-shadow: none !important; 
+        }
+        
+        .rip-line { position: absolute; top: 50%; left: 0; width: 100%; height: 2px; background: var(--used-red); box-shadow: 0 0 15px var(--used-red); transform: translateY(-50%) rotate(-3deg); display: none; z-index: 10; }
         .ticket.used .rip-line { display: block; }
 
+        /* LOGIN */
         #login-screen { position: fixed; inset: 0; background: #000; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
         #login-screen input {
-            background: #111; border: 1px solid var(--accent-neon); color: #fff;
+            background: #050505; border: 1px solid var(--accent-neon); color: #fff;
             padding: 12px; font-family: 'Orbitron'; text-align: center; margin-top: 15px;
-            width: 100%; max-width: 260px; border-radius: 4px; outline: none; transition: all 0.3s;
+            width: 100%; max-width: 260px; border-radius: 0; outline: none; transition: all 0.3s;
+            box-shadow: var(--neon-shadow-cyan);
         }
-        #login-screen input.error { border-color: var(--used-red); animation: shake 0.4s; }
+        #login-screen input.error { border-color: var(--used-red); animation: shake 0.4s; box-shadow: 0 0 15px var(--used-red); }
         #error-msg { color: var(--used-red); font-size: 0.65rem; margin-top: 15px; opacity: 0; transition: opacity 0.3s; letter-spacing: 1px; font-weight: bold; }
 
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
 
-        footer { margin: 40px 0 20px 0; font-size: 0.65rem; letter-spacing: 2px; color: #444; width: 100%; text-align: center; }
+        footer { margin: 40px 0 20px 0; font-size: 0.6rem; letter-spacing: 3px; color: #333; width: 100%; text-align: center; }
         footer span { color: var(--accent-neon); font-weight: 900; }
         #loader { display: none; color: var(--accent-neon); font-size: 0.7rem; margin-top: 20px; letter-spacing: 2px; font-weight: bold; }
     </style>
@@ -93,7 +155,7 @@
             <img src="logo.png" class="logo-cat" alt="Gato VaroCreations">
             <div class="logo-text">VARO CREATIONS</div>
         </div>
-        <p style="font-size: 0.7rem; letter-spacing: 2px; margin: 0;">SE REQUIERE ACCESO SEGURO</p>
+        <p style="font-size: 0.7rem; letter-spacing: 2px; margin: 0; color: #666;">SE REQUIERE ACCESO SEGURO</p>
         <input type="password" id="pass" placeholder="CONTRASEÑA" onkeydown="handleEnter(event)">
         <div id="error-msg">ACCESO DENEGADO: CLAVE INCORRECTA</div>
     </div>
@@ -122,29 +184,22 @@
             { id: 7, dest: "DESTINO LIBRE", km: "?? KM", type: "special" }
         ];
 
-        // --- NUEVA FUNCIÓN: COMPROBAR LOGIN AL CARGAR ---
         window.onload = () => {
             if (sessionStorage.getItem('isLogged') === 'true') {
                 showApp();
             }
         };
 
-        function handleEnter(e) {
-            if (e.key === 'Enter') {
-                checkLogin(e.target.value);
-            }
-        }
+        function handleEnter(e) { e.key === 'Enter' && checkLogin(e.target.value); }
 
         function checkLogin(val) {
             const input = document.getElementById('pass');
-            const error = document.getElementById('error-msg');
-
             if (val === ACCESS_KEY) {
-                sessionStorage.setItem('isLogged', 'true'); // Guardar sesión
+                sessionStorage.setItem('isLogged', 'true');
                 showApp();
             } else {
                 input.classList.add('error');
-                error.style.opacity = '1';
+                document.getElementById('error-msg').style.opacity = '1';
                 input.value = '';
                 setTimeout(() => { input.classList.remove('error'); }, 400);
             }
@@ -162,12 +217,9 @@
         async function initApp() {
             document.getElementById('loader').style.display = 'block';
             try {
-                const response = await fetch(SCRIPT_URL);
-                const states = await response.json();
+                const states = await (await fetch(SCRIPT_URL)).json();
                 render(states);
-            } catch (e) {
-                alert("Error de sincronización.");
-            }
+            } catch (e) { alert("Error de sincronización."); }
             document.getElementById('loader').style.display = 'none';
         }
 
@@ -184,7 +236,7 @@
                         <div class="ticket-header">PASE №00${t.id}</div>
                         <div class="destination">${t.dest}</div>
                         <div class="km">${t.km}</div>
-                        <span class="unit">${isUsed ? 'TICKET UTILIZADO' : 'PRESIONA PARA USAR'}</span>
+                        <span class="unit">${isUsed ? 'TICKET UTILIZADO' : 'CONFIRMAR CANJE'}</span>
                     </div>
                 `;
                 if (!isUsed) div.onclick = () => useTicket(t.id);
@@ -193,13 +245,9 @@
         }
 
         async function useTicket(id) {
-            if (confirm("¿Confirmar canje de este pase? Esta acción es irreversible.")) {
+            if (confirm("¿Confirmar canje? Esta acción es irreversible.")) {
                 document.getElementById('loader').style.display = 'block';
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify({id: id})
-                });
+                await fetch(SCRIPT_URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify({id: id})});
                 document.getElementById('t-'+id).classList.add('used');
                 setTimeout(() => { location.reload(); }, 800);
             }
