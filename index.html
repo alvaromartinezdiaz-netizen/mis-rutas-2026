@@ -236,7 +236,7 @@
                         <div class="ticket-header">PASE №00${t.id}</div>
                         <div class="destination">${t.dest}</div>
                         <div class="km">${t.km}</div>
-                        <span class="unit">${isUsed ? 'TICKET UTILIZADO' : 'CONFIRMAR CANJE'}</span>
+                        <span class="unit">${isUsed ? 'TICKET UTILIZADO' : 'PULSA PARA CANJEAR'}</span>
                     </div>
                 `;
                 if (!isUsed) div.onclick = () => useTicket(t.id);
