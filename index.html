@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tickets de Ruta - VAROCREATIONS</title>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --accent-neon: #00f2fe;
+            --accent-gold: #ffcc00;
+            --accent-forest: #39ff14;
+            --ticket-bg: linear-gradient(145deg, #1a1a1a, #0a0a0a);
+            --text-main: #ffffff;
+            --used-red: #ff3e3e;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 50% -20%, #222 0%, transparent 50%);
+            color: var(--text-main);
+            font-family: 'Orbitron', sans-serif;
+            margin: 0; padding: 20px;
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* LOGO */
+        .logo { 
+            width: 160px; /* Ajustado para evitar cortes */
+            height: auto; 
+            margin-bottom: 20px; 
+            filter: drop-shadow(0 0 8px rgba(0, 242, 254, 0.5));
+            max-width: 90vw;
+        }
+
+        h1 { font-size: 0.9rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 30px; text-align: center; color: #555; }
+
+        /* GRID */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; max-width: 450px; display: none; }
+        .ticket-container:last-child { grid-column: 1 / span 2; justify-self: center; width: 85%; }
+        .ticket-container { position: relative; height: 180px; perspective: 1000px; }
+
+        .ticket {
+            position: absolute; width: 100%; height: 100%;
+            background: var(--ticket-bg); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between;
+            z-index: 5; transition: all 0.4s ease;
+            clip-path: polygon(0 0, 100% 0, 100% calc(50% - 8px), calc(100% - 8px) 50%, 100% calc(50% + 8px), 100% 100%, 0 100%, 0 calc(50% + 8px), 8px 50%, 0 calc(50% - 8px));
+        }
+
+        .ticket.fores .ticket-header, .ticket.fores .km { color: var(--accent-forest); }
+        .ticket.aliga .ticket-header, .ticket.aliga .km { color: var(--accent-neon); }
+        .ticket.special { border: 1px solid var(--accent-gold); }
+        .ticket.special .ticket-header, .ticket.special .km, .ticket.special .destination { color: var(--accent-gold); }
+
+        .ticket-header { font-size: 0.55rem; letter-spacing: 1px; font-weight: bold; }
+        .destination { font-size: 0.8rem; margin: 5px 0; font-weight: 600; min-height: 2.4em; line-height: 1.2; }
+        .km { font-size: 1.8rem; font-weight: 900; text-align: center; }
+        .unit { font-size: 0.55rem; color: #666; letter-spacing: 1px; text-align: center; display: block; }
+
+        /* ESTADO USADO */
+        .ticket.used { opacity: 0.3; filter: grayscale(1); transform: scale(0.95) rotate(-2deg); pointer-events: none; }
+        .rip-line { position: absolute; top: 50%; left: 0; width: 100%; height: 2px; background: var(--used-red); box-shadow: 0 0 10px var(--used-red); transform: translateY(-50%) rotate(-3deg); display: none; z-index: 10; }
+        .ticket.used .rip-line { display: block; }
+
+        /* LOGIN */
+        #login-screen { position: fixed; inset: 0; background: #000; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
+        #login-screen input {
+            background: #111; border: 1px solid var(--accent-neon); color: #fff;
+            padding: 12px; font-family: 'Orbitron'; text-align: center; margin-top: 15px;
+            width: 100%; max-width: 260px; border-radius: 4px; outline: none; transition: all 0.3s;
+        }
+        #login-screen input.error { border-color: var(--used-red); animation: shake 0.4s; }
+        #error-msg { color: var(--used-red); font-size: 0.65rem; margin-top: 15px; opacity: 0; transition: opacity 0.3s; letter-spacing: 1px; font-weight: bold; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        footer { margin: 40px 0 20px 0; font-size: 0.65rem; letter-spacing: 2px; color: #444; width: 100%; text-align: center; }
+        footer span { color: var(--accent-neon); font-weight: 900; }
+        #loader { display: none; color: var(--accent-neon); font-size: 0.7rem; margin-top: 20px; letter-spacing: 2px; font-weight: bold; }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div id="login-screen">
+        <img src="logo.png" class="logo" alt="VAROCREATIONS">
+        <p style="font-size: 0.7rem; letter-spacing: 2px; margin: 0;">SE REQUIERE ACCESO SEGURO</p>
+        <input type="password" id="pass" placeholder="CONTRASEÑA" onkeydown="handleEnter(event)">
+        <div id="error-msg">ACCESO DENEGADO: CLAVE INCORRECTA</div>
+    </div>
+
+    <img src="logo.png" class="logo" id="main-logo" style="display:none">
+    <h1 id="title" style="display:none">SISTEMA DE RUTAS V2.0</h1>
+    <div id="loader">ESTABLECIENDO CONEXIÓN SEGURA...</div>
+    <div class="grid" id="container"></div>
+    <footer id="footer" style="display:none">BY <span>VAROCREATIONS</span></footer>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx1BQ8PhyRC0_6vVK9GXeb-lxB5OrFIf1yRhzI_cqSIX-Ebvc_1OJEeO_a0PPpjMIx94g/exec";
+        const ACCESS_KEY = "Danielcito1999";
+
+        const ticketsData = [
+            { id: 1, dest: "Mas de Forés", km: "8 KM", type: "fores" },
+            { id: 2, dest: "Mas de Forés", km: "8 KM", type: "fores" },
+            { id: 3, dest: "Mas de Forés", km: "8 KM", type: "fores" },
+            { id: 4, dest: "Mas de Forés", km: "8 KM", type: "fores" },
+            { id: 5, dest: "Niu de l'Àliga", km: "14 KM", type: "aliga" },
+            { id: 6, dest: "Niu de l'Àliga", km: "14 KM", type: "aliga" },
+            { id: 7, dest: "DESTINO LIBRE", km: "?? KM", type: "special" }
+        ];
+
+        function handleEnter(e) {
+            if (e.key === 'Enter') {
+                checkLogin(e.target.value);
+            }
+        }
+
+        function checkLogin(val) {
+            const input = document.getElementById('pass');
+            const error = document.getElementById('error-msg');
+
+            if (val === ACCESS_KEY) {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-logo').style.display = 'block';
+                document.getElementById('title').style.display = 'block';
+                document.getElementById('footer').style.display = 'block';
+                document.getElementById('container').style.display = 'grid';
+                initApp();
+            } else {
+                input.classList.add('error');
+                error.style.opacity = '1';
+                input.value = '';
+                setTimeout(() => { input.classList.remove('error'); }, 400);
+            }
+        }
+
+        async function initApp() {
+            document.getElementById('loader').style.display = 'block';
+            try {
+                const response = await fetch(SCRIPT_URL);
+                const states = await response.json();
+                render(states);
+            } catch (e) {
+                alert("Error de sincronización con la base de datos.");
+            }
+            document.getElementById('loader').style.display = 'none';
+        }
+
+        function render(states) {
+            const container = document.getElementById('container');
+            container.innerHTML = '';
+            ticketsData.forEach(t => {
+                const isUsed = states[t.id] === "usado";
+                const div = document.createElement('div');
+                div.className = 'ticket-container';
+                div.innerHTML = `
+                    <div class="ticket ${t.type} ${isUsed ? 'used' : ''}" id="t-${t.id}">
+                        <div class="rip-line"></div>
+                        <div class="ticket-header">PASE №00${t.id}</div>
+                        <div class="destination">${t.dest}</div>
+                        <div class="km">${t.km}</div>
+                        <span class="unit">${isUsed ? 'TICKET UTILIZADO' : 'PRESIONA PARA USAR'}</span>
+                    </div>
+                `;
+                if (!isUsed) div.onclick = () => useTicket(t.id);
+                container.appendChild(div);
+            });
+        }
+
+        async function useTicket(id) {
+            if (confirm("¿Confirmar canje de este pase? Esta acción es irreversible.")) {
+                document.getElementById('loader').style.display = 'block';
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({id: id})
+                });
+                document.getElementById('t-'+id).classList.add('used');
+                setTimeout(() => { location.reload(); }, 800);
+            }
+        }
+    </script>
+</body>
+</html>
