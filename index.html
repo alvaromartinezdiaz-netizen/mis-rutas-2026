@@ -27,44 +27,22 @@
             overflow-x: hidden;
         }
 
-        /* --- CONTENEDOR DEL LOGO --- */
-        .logo-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 20px;
-            z-index: 10;
-        }
+        .logo-container { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; z-index: 10; }
 
-        /* --- EL GATO (RECORTADO VISUALMENTE) --- */
         .logo-cat { 
-            width: 140px; /* Ancho deseado */
-            height: auto; 
-            max-width: 90vw;
-            
-            /* --- ESTA ES LA CLAVE PARA RECORTAR --- */
-            /* Muestra los primeros 120px de altura y oculta el resto */
+            width: 140px; height: auto; max-width: 90vw;
             clip-path: polygon(0 0, 100% 0, 100% 120px, 0 120px);
-            
-            /* Halo cian sutil para integrarlo en la estética */
             filter: drop-shadow(0 0 10px rgba(0, 242, 254, 0.4));
         }
 
-        /* --- EL TEXTO "VARO CREATIONS" --- */
         .logo-text {
-            color: rgba(0, 242, 254, 0.8); /* Cian neón suave */
-            font-size: 0.9rem;
-            font-weight: 400;
-            letter-spacing: 5px; /* Espaciado técnico */
-            text-transform: uppercase;
-            margin-top: -10px; /* Sube un poco para unirse al gato */
-            text-shadow: 0 0 5px rgba(0, 242, 254, 0.4);
-            text-align: center;
+            color: rgba(0, 242, 254, 0.8); font-size: 0.9rem; font-weight: 400;
+            letter-spacing: 5px; text-transform: uppercase; margin-top: -10px;
+            text-shadow: 0 0 5px rgba(0, 242, 254, 0.4); text-align: center;
         }
 
         h1 { font-size: 0.9rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 30px; text-align: center; color: #555; }
 
-        /* GRID */
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; max-width: 450px; display: none; }
         .ticket-container:last-child { grid-column: 1 / span 2; justify-self: center; width: 85%; }
         .ticket-container { position: relative; height: 180px; perspective: 1000px; }
@@ -87,12 +65,10 @@
         .km { font-size: 1.8rem; font-weight: 900; text-align: center; }
         .unit { font-size: 0.55rem; color: #666; letter-spacing: 1px; text-align: center; display: block; }
 
-        /* ESTADO USADO */
         .ticket.used { opacity: 0.3; filter: grayscale(1); transform: scale(0.95) rotate(-2deg); pointer-events: none; }
         .rip-line { position: absolute; top: 50%; left: 0; width: 100%; height: 2px; background: var(--used-red); box-shadow: 0 0 10px var(--used-red); transform: translateY(-50%) rotate(-3deg); display: none; z-index: 10; }
         .ticket.used .rip-line { display: block; }
 
-        /* LOGIN */
         #login-screen { position: fixed; inset: 0; background: #000; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
         #login-screen input {
             background: #111; border: 1px solid var(--accent-neon); color: #fff;
@@ -102,11 +78,7 @@
         #login-screen input.error { border-color: var(--used-red); animation: shake 0.4s; }
         #error-msg { color: var(--used-red); font-size: 0.65rem; margin-top: 15px; opacity: 0; transition: opacity 0.3s; letter-spacing: 1px; font-weight: bold; }
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
-        }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
 
         footer { margin: 40px 0 20px 0; font-size: 0.65rem; letter-spacing: 2px; color: #444; width: 100%; text-align: center; }
         footer span { color: var(--accent-neon); font-weight: 900; }
@@ -121,7 +93,6 @@
             <img src="logo.png" class="logo-cat" alt="Gato VaroCreations">
             <div class="logo-text">VARO CREATIONS</div>
         </div>
-        
         <p style="font-size: 0.7rem; letter-spacing: 2px; margin: 0;">SE REQUIERE ACCESO SEGURO</p>
         <input type="password" id="pass" placeholder="CONTRASEÑA" onkeydown="handleEnter(event)">
         <div id="error-msg">ACCESO DENEGADO: CLAVE INCORRECTA</div>
@@ -151,6 +122,13 @@
             { id: 7, dest: "DESTINO LIBRE", km: "?? KM", type: "special" }
         ];
 
+        // --- NUEVA FUNCIÓN: COMPROBAR LOGIN AL CARGAR ---
+        window.onload = () => {
+            if (sessionStorage.getItem('isLogged') === 'true') {
+                showApp();
+            }
+        };
+
         function handleEnter(e) {
             if (e.key === 'Enter') {
                 checkLogin(e.target.value);
@@ -160,21 +138,25 @@
         function checkLogin(val) {
             const input = document.getElementById('pass');
             const error = document.getElementById('error-msg');
-            const loginScreen = document.getElementById('login-screen');
 
             if (val === ACCESS_KEY) {
-                loginScreen.style.display = 'none';
-                document.getElementById('main-logo-container').style.display = 'flex';
-                document.getElementById('title').style.display = 'block';
-                document.getElementById('footer').style.display = 'block';
-                document.getElementById('container').style.display = 'grid';
-                initApp();
+                sessionStorage.setItem('isLogged', 'true'); // Guardar sesión
+                showApp();
             } else {
                 input.classList.add('error');
                 error.style.opacity = '1';
                 input.value = '';
                 setTimeout(() => { input.classList.remove('error'); }, 400);
             }
+        }
+
+        function showApp() {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-logo-container').style.display = 'flex';
+            document.getElementById('title').style.display = 'block';
+            document.getElementById('footer').style.display = 'block';
+            document.getElementById('container').style.display = 'grid';
+            initApp();
         }
 
         async function initApp() {
@@ -184,7 +166,7 @@
                 const states = await response.json();
                 render(states);
             } catch (e) {
-                alert("Error de sincronización con la base de datos.");
+                alert("Error de sincronización.");
             }
             document.getElementById('loader').style.display = 'none';
         }
